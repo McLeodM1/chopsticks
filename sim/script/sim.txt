@@ -1,0 +1,8 @@
+vlib work
+vcom -93 -work work ../../src/HEXLED.vhd
+vcom -93 -work work ../../src/gameTop.vhd
+vcom -93 -work work ../../src/Chopsticks.vhd
+vcom -93 -work work ../src/Chopsticks_tb.vhd
+vsim -novopt Chopsticks_tb
+do wave.do
+run 2000 ns
