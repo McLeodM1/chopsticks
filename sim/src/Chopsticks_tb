@@ -1,0 +1,278 @@
+--  DESIGNER NAME: Michael McLeod
+--
+--       LAB NAME: Chopsticks
+--
+--      FILE NAME: Chopsticks_tb.vhd
+--
+--   DATE CREATED: 1/2/2016
+--
+-------------------------------------------------------------------------------
+
+
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+USE ieee.std_logic_unsigned.all;
+USE ieee.numeric_std.ALL;
+
+ENTITY Chopsticks_tb IS
+END Chopsticks_tb;
+
+ARCHITECTURE behavior OF Chopsticks_tb IS 
+	
+	-- Component Declaration for the Unit Under Test (UUT)
+	component gameTop is
+	port(
+    clk                 : in std_logic;
+    reset_n             : in std_logic;
+	split				: in std_logic;
+	secure				: in std_logic;
+    switches	        : in std_logic_vector(3 downto 0);
+	rx_instruction      : in std_logic_vector(4 downto 0);
+	HEX_play_right		: out std_logic_vector(6 downto 0);
+	HEX_opp_right		: out std_logic_vector(6 downto 0);
+	HEX_opp_left		: out std_logic_vector(6 downto 0);
+	HEX_play_left		: out std_logic_vector(6 downto 0)
+	);
+	end component;
+
+	-- Change the value of the case(s) you want to test to true in order to run them.
+	 -- perfect scenario where a code is input, the set switch is set high closing the latch, the correct input, and the latch opens
+	constant case1  : boolean := false;  
+	constant case2  : boolean := false;   -- This fail case tries to change the value of a previous input
+	constant case3  : boolean := true;   -- This fail case has he wrong number input after the latch has been set
+	constant case4  : boolean := false;   -- Rollover goes from 9 to 1 despite beinning at 0
+	
+	
+	--Inputs
+	SIGNAL 	reset_n :  std_logic := '1';
+	SIGNAL 	clk :  std_logic := '0';
+	signal	split_tb : std_logic := '1';
+	SIGNAL  switches_tb      :std_logic_vector(3 downto 0) :="0000";
+	SIGNAL	rx_instruction_tb      :std_logic_vector(4 downto 0) := "00000";
+	SIGNAL	secure_tb	: std_logic := '1';
+	
+	
+	
+	--Outputs
+	SIGNAL	HEX_play_right_tb		: std_logic_vector(6 downto 0);
+	SIGNAL	HEX_opp_right_tb		: std_logic_vector(6 downto 0);
+	SIGNAL	HEX_opp_left_tb		: std_logic_vector(6 downto 0);
+	SIGNAL	HEX_play_left_tb		: std_logic_vector(6 downto 0);
+	
+	
+	-- signals for test bench control
+    SIGNAL period : time    := 20 ns;  -- 50MHz
+
+BEGIN
+
+	-- Instantiate the Unit Under Test (UUT)
+	uut: gameTop
+	PORT MAP(
+		 clk => clk,
+		 reset_n => reset_n,
+		 split => split_tb,
+		 secure => secure_tb,
+		 switches => switches_tb,
+		 rx_instruction => rx_instruction_tb,
+		 HEX_play_right => HEX_play_right_tb,		
+	     HEX_opp_right => HEX_opp_right_tb,	
+	     HEX_opp_left => HEX_opp_left_tb,			
+         HEX_play_left => HEX_play_left_tb
+		 );
+		 
+  clock: process
+	begin
+		clk <= not clk;
+		wait for period/2;
+	end process;   
+	
+  -- reset process
+  async_reset: process
+    begin
+      wait for 40 ns;
+      reset_n <= '1';
+      wait;
+    end process; 
+    
+  testing: process 
+  begin
+	if (case1 = true) then
+		wait for period*3;
+		secure_tb <= '0';
+		wait for period;
+		secure_tb <= '1';
+		wait for period;
+		switches_tb <= "0001";
+		wait for period*3;
+		secure_tb <= '0';
+		wait for period;
+		secure_tb <= '1';
+		wait for period;
+		rx_instruction_tb <= "11000";
+		wait for period;
+		switches_tb <= "0010";
+		wait for period*3;
+		secure_tb <= '0';
+		wait for period;
+		secure_tb <= '1';
+		wait for period;
+		rx_instruction_tb <= "10100";
+		wait for period;
+		switches_tb <= "0100";
+		wait for period*3;
+		secure_tb <= '0';
+		wait for period;
+		secure_tb <= '1';
+		wait for period;
+		rx_instruction_tb <= "10010";
+		wait for period;
+		switches_tb <= "1000";
+		wait for period*3;
+		secure_tb <= '0';
+		wait for period;
+		secure_tb <= '1';
+		wait for period;
+		rx_instruction_tb <= "10010";
+		wait for period;
+		
+	elsif (case2 = true) then
+		wait for period*3;
+		secure_tb <= '0';
+		wait for period;
+		secure_tb <= '1';
+		wait for period;
+		switches_tb <= "0001";
+		wait for period*3;
+		secure_tb <= '0';
+		wait for period;
+		secure_tb <= '1';
+		wait for period;
+		rx_instruction_tb <= "10001";
+		wait for period;
+		switches_tb <= "0100";
+		wait for period*3;
+		secure_tb <= '0';
+		wait for period;
+		secure_tb <= '1';
+		wait for period;
+		rx_instruction_tb <= "11000";
+		wait for period*3;
+		split_tb <= '0';
+		wait for period;
+		split_tb <= '1';
+		wait for period;
+		switches_tb <= "0001";
+		wait for period*3;
+		secure_tb <= '0';
+		wait for period;
+		secure_tb <= '1';
+		wait for period;
+		rx_instruction_tb <= "10001";
+		wait for period;
+		switches_tb <= "1000";
+		wait for period*3;
+		secure_tb <= '0';
+		wait for period;
+		secure_tb <= '1';
+		wait for period;
+		rx_instruction_tb <= "10001";
+		wait for period;
+		switches_tb <= "0010";
+		wait for period*3;
+		secure_tb <= '0';
+		wait for period;
+		secure_tb <= '1';
+		wait for period;
+		rx_instruction_tb <= "10010";
+		wait for period;
+		switches_tb <= "0100";
+		wait for period*3;
+		secure_tb <= '0';
+		wait for period;
+		secure_tb <= '1';
+		wait for period;
+		rx_instruction_tb <= "10010";
+		wait for period;
+		switches_tb <= "1000";
+		wait for period*3;
+		secure_tb <= '0';
+		wait for period;
+		secure_tb <= '1';
+		wait for period;
+		rx_instruction_tb <= "10010";
+		wait for period;
+		
+	elsif (case3 = true) then
+		wait for period*3;
+		secure_tb <= '0';
+		wait for period;
+		secure_tb <= '1';
+		wait for period;
+		switches_tb <= "0001";
+		wait for period*3;
+		secure_tb <= '0';
+		wait for period;
+		secure_tb <= '1';
+		wait for period;
+		rx_instruction_tb <= "10001";
+		wait for period;
+		switches_tb <= "0100";
+		wait for period*3;
+		secure_tb <= '0';
+		wait for period;
+		secure_tb <= '1';
+		wait for period;
+		rx_instruction_tb <= "11000";
+		wait for period*3;
+		split_tb <= '0';
+		wait for period;
+		split_tb <= '1';
+		wait for period;
+		switches_tb <= "0001";
+		wait for period*3;
+		secure_tb <= '0';
+		wait for period;
+		secure_tb <= '1';
+		wait for period;
+		rx_instruction_tb <= "10001";
+		wait for period;
+		switches_tb <= "1000";
+		wait for period*3;
+		secure_tb <= '0';
+		wait for period;
+		secure_tb <= '1';
+		wait for period;
+		rx_instruction_tb <= "10001";
+		wait for period;
+		switches_tb <= "0010";
+		wait for period*3;
+		secure_tb <= '0';
+		wait for period;
+		secure_tb <= '1';
+		wait for period;
+		rx_instruction_tb <= "00001";
+		wait for period*3;
+		rx_instruction_tb <= "11000";
+		wait for period;
+		switches_tb <= "0001";
+		wait for period*3;
+		secure_tb <= '0';
+		wait for period;
+		secure_tb <= '1';
+		wait for period;
+		rx_instruction_tb <= "10010";
+		wait for period;
+		switches_tb <= "1000";
+		wait for period*3;
+		secure_tb <= '0';
+		wait for period;
+		secure_tb <= '1';
+		wait for period;
+		rx_instruction_tb <= "10010";
+		wait for period;		
+	end if;
+	wait;
+	end process;
+  
+
+END;
